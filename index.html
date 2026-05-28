@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Insígnias Rush</title>
+<title>BRYVER</title>
 <style>
 *{
 margin:0;
@@ -156,10 +157,46 @@ height:90px;
 border-radius:50%;
 background:radial-gradient(circle,#67e8f9,#2563eb,#1d4ed8);
 cursor:pointer;
-animation:shrink 1s linear forwards;
 box-shadow:0 0 35px #38bdf8;
-border:5px solid rgba(255,255,255,0.7);
-overflow:hidden;
+border:4px solid rgba(255,255,255,0.85);
+overflow:visible;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:3;
+}
+
+/* inner target (visible center) */
+.circle .hit-target{
+width:54px;
+height:54px;
+border-radius:50%;
+background:rgba(255,255,255,0.06);
+border:3px solid rgba(255,255,255,0.9);
+display:block;
+z-index:4;
+}
+
+/* approach ring that shrinks toward target to indicate timing like osu! */
+.approach{
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%) scale(1);
+width:160px;
+height:160px;
+border-radius:50%;
+border:4px solid rgba(255,255,255,0.18);
+box-shadow:0 0 30px rgba(99,102,241,0.12);
+pointer-events:none;
+z-index:2;
+transition:transform linear;
+}
+
+/* fallback shrinking animation if needed */
+@keyframes shrink{
+from{transform:scale(1);opacity:1;}
+to{transform:scale(0.25);opacity:0.12;}
 }
 
 .circle::after{
@@ -167,7 +204,8 @@ content:'';
 position:absolute;
 inset:10px;
 border-radius:50%;
-border:3px solid rgba(255,255,255,0.7);
+border:3px solid rgba(255,255,255,0.3);
+pointer-events:none;
 }
 
 .hit-effect{
@@ -216,35 +254,127 @@ align-items:center;
 justify-content:center;
 flex-direction:column;
 z-index:9999;
-animation:fade 0.4s;
+animation:fade 0.35s;
 overflow:hidden;
 }
 
+/* Confetti layer */
+.pack-opening .confetti {
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+.confetti-piece{
+  position:absolute;
+  width:10px;
+  height:18px;
+  opacity:0.95;
+  transform:translateY(-10vh) rotate(0deg);
+  animation:fall 1200ms linear forwards;
+  border-radius:2px;
+}
+@keyframes fall{
+  to{
+    transform:translateY(110vh) rotate(360deg);
+    opacity:0;
+  }
+}
+
 .pack-box{
-width:240px;
-height:320px;
-border-radius:30px;
+width:280px;
+height:360px;
+border-radius:26px;
 background:linear-gradient(135deg,#2563eb,#7c3aed,#0ea5e9);
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:60px;
+font-size:64px;
 font-weight:900;
-box-shadow:0 0 70px rgba(255,255,255,0.5);
-animation:packShake 0.8s infinite alternate;
+box-shadow:0 10px 90px rgba(99,102,241,0.35);
+animation:packPulse 800ms ease-in-out infinite alternate;
 position:relative;
 overflow:hidden;
+border:4px solid rgba(255,255,255,0.08);
+}
+
+.pack-box .sparkle{
+position:absolute;
+width:200%;
+height:200%;
+left:-50%;
+top:-50%;
+background:radial-gradient(circle at 20% 20%, rgba(255,255,255,0.06), transparent 10%, transparent 100%);
+mix-blend-mode:screen;
+animation:spark 1400ms linear infinite;
+pointer-events:none;
+}
+
+@keyframes spark{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
 }
 
 .pack-text{
-margin-top:25px;
-font-size:30px;
-font-weight:bold;
+margin-top:20px;
+font-size:26px;
+font-weight:800;
+letter-spacing:0.6px;
+color:#e6eefc;
+text-shadow:0 2px 10px rgba(0,0,0,0.6);
 }
 
-@keyframes packShake{
-0%{transform:rotate(-3deg) scale(1);} 
-100%{transform:rotate(3deg) scale(1.08);} 
+/* Pack open expansion */
+.pack-opening .reveal-stage{
+position:relative;
+width:100%;
+max-width:980px;
+display:flex;
+gap:20px;
+align-items:center;
+justify-content:center;
+pointer-events:none;
+}
+
+/* Card reveal animation tweaked */
+.pack-card{
+transform:translateY(60px) scale(0.6);
+opacity:0;
+transition:transform 550ms cubic-bezier(.2,.9,.3,1), opacity 300ms;
+pointer-events:auto;
+}
+.pack-card.revealed{
+transform:translateY(0) scale(1);
+opacity:1;
+box-shadow:0 20px 50px rgba(0,0,0,0.55);
+}
+
+/* small sparkle on medal */
+.unique-medal.sparkle::after{
+content:'';
+position:absolute;
+width:40%;
+height:40%;
+top:6%;
+right:6%;
+background:radial-gradient(circle,#fff8,#ffffff00);
+filter:blur(6px);
+opacity:0.9;
+transform:rotate(12deg);
+}
+
+/* gift flash */
+.pack-flash{
+position:absolute;
+inset:0;
+background:radial-gradient(circle, rgba(255,255,255,0.06), transparent 30%);
+pointer-events:none;
+animation:flash 420ms ease-out;
+}
+@keyframes flash{
+0%{opacity:0; transform:scale(0.98);}
+50%{opacity:1;}
+100%{opacity:0; transform:scale(1.02);}
 }
 
 .badge{
@@ -511,7 +641,7 @@ transform:scale(1.08) translateY(-5px);
 
 <div style="background:rgba(15,23,42,0.95);padding:45px;border-radius:35px;width:420px;max-width:90%;text-align:center;border:2px solid #334155;box-shadow:0 0 50px rgba(59,130,246,0.35);">
 
-<h1 style="font-size:42px;margin-bottom:10px;background:linear-gradient(90deg,#38bdf8,#a855f7,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">INSÍGNIAS RUSH</h1>
+<h1 style="font-size:42px;margin-bottom:10px;background:linear-gradient(90deg,#38bdf8,#a855f7,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">BRYVER</h1>
 
 <p style="margin-bottom:30px;color:#94a3b8;font-size:18px;">Digite seu nome para iniciar</p>
 
@@ -522,17 +652,26 @@ transform:scale(1.08) translateY(-5px);
 </div>
 </div>
 <div id="topbar">
-<div>
-<h1>INSÍGNIAS RUSH</h1>
-<div id="playerName" style="font-size:16px;color:#94a3b8;margin-top:5px;">Jogador</div>
-</div>
-<h1>INSÍGNIAS RUSH</h1>
-<div id="coins">🪙 0</div>
+  <div>
+    <h1>BRYVER</h1>
+    <div id="playerName" style="font-size:16px;color:#94a3b8;margin-top:5px;">Jogador</div>
+  </div>
+  <h1>BRYVER</h1>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="coins">🪙 0</div>
+
+    <!-- Hidden file input for importing account -->
+    <input id="importFileInput" type="file" accept=".json" style="display:none" onchange="handleImportFile(this.files)">
+
+    <button onclick="document.getElementById('importFileInput').click()" id="importBtn" style="background:linear-gradient(135deg,#06b6d4,#0ea5e9);border:none;padding:10px 14px;border-radius:12px;color:white;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(6,182,212,0.18);">IMPORTAR</button>
+
+    <button onclick="exportAccount()" id="exportBtn" style="background:linear-gradient(135deg,#0ea5e9,#06b6d4);border:none;padding:10px 14px;border-radius:12px;color:white;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(6,182,212,0.18);">EXPORTAR</button>
+  </div>
 </div>
 
 <div id="partida" class="screen active">
 <div class="hero">
-<h2>⚔️ INSÍGNIAS RUSH</h2>
+<h2>⚔️ BRYVER</h2>
 <p>Colecione insígnias raras, evolua até o nível 5 e complete toda a coleção!</p>
 </div>
 
@@ -556,7 +695,15 @@ transform:scale(1.08) translateY(-5px);
 <p>Clique nos círculos antes deles desaparecerem e ganhe moedas!</p>
 <h3 style="margin-top:15px;">Pontos: <span id="score">0</span></h3>
 <h3>Tempo: <span id="time">30</span>s</h3>
-<button class="buy-btn" onclick="startGame()">COMEÇAR PARTIDA</button>
+<div style="display:flex;gap:12px;align-items:center;margin-top:10px;">
+  <div style="background:#0b1220;padding:10px 14px;border-radius:12px;border:1px solid #233047;">
+    Combo: <strong id="comboCount">0</strong>
+  </div>
+  <div style="background:#0b1220;padding:10px 14px;border-radius:12px;border:1px solid #233047;">
+    Multiplicador: <strong id="multiplierDisplay">x1</strong>
+  </div>
+</div>
+<button class="buy-btn" onclick="startGame()" id="startBtn">COMEÇAR PARTIDA</button>
 </div>
 
 <div id="gameArea"></div>
@@ -640,7 +787,14 @@ let gameRunning = false;
 let spawnInterval;
 let timerInterval;
 
+// Combo system
+let combo = 0;
+let multiplier = 1;
+
+// UI refs
 const gameArea = document.getElementById('gameArea');
+const comboCountEl = () => document.getElementById('comboCount');
+const multiplierEl = () => document.getElementById('multiplierDisplay');
 
 const badgeDesigns = {
 'Lobo Lunar':'🌙',
@@ -787,6 +941,102 @@ bestScore: localStorage.getItem('bestScore') || 0
 localStorage.setItem('insigniasRushSave',JSON.stringify(save));
 }
 
+// Export account / save file as JSON
+function exportAccount(){
+  // Ensure current game saved state is up-to-date
+  saveGame();
+
+  const raw = localStorage.getItem('insigniasRushSave') || '{}';
+  const blob = new Blob([raw], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const nameSafe = (playerName || 'player').replace(/[^\w\-]/g,'_');
+  a.href = url;
+  a.download = `bryver_${nameSafe}_export.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 1000);
+}
+
+/* Import helpers */
+function handleImportFile(files){
+  if(!files || files.length === 0) return;
+  const file = files[0];
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const text = e.target.result;
+      const data = JSON.parse(text);
+      importAccount(data);
+    }catch(err){
+      alert('Arquivo inválido ou corrompido.');
+      console.error(err);
+    }finally{
+      // clear file input so same file can be re-selected later
+      document.getElementById('importFileInput').value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function importAccount(data){
+  if(!data || typeof data !== 'object'){
+    alert('Dados de conta inválidos.');
+    return;
+  }
+
+  // Basic validation of expected fields
+  if(!('coins' in data) || !('collection' in data)){
+    alert('Arquivo não contém dados de Insígnias Rush.');
+    return;
+  }
+
+  // Apply imported values (whitelisted)
+  try{
+    coins = Number(data.coins) || 0;
+    // Merge collection safely: only known badges
+    if(typeof data.collection === 'object'){
+      for(const key in data.collection){
+        if(collection[key]){
+          const importedItem = data.collection[key];
+          collection[key].count = Number(importedItem.count) || collection[key].count || 0;
+          collection[key].level = Number(importedItem.level) || collection[key].level || 0;
+        }
+      }
+    }
+
+    // player name optional
+    if(data.playerName && typeof data.playerName === 'string'){
+      playerName = data.playerName;
+      const playerEl = document.getElementById('playerName');
+      if(playerEl) playerEl.innerText = '👤 ' + playerName;
+    }
+
+    // bestScore optional
+    if('bestScore' in data){
+      const bs = Number(data.bestScore) || 0;
+      localStorage.setItem('bestScore', bs);
+    }
+
+    // Save to localStorage and refresh UI
+    saveGame();
+    renderCollection();
+    updateCoins();
+    updateStats();
+    document.getElementById('bestScore').innerText = localStorage.getItem('bestScore') || 0;
+
+    // Close login screen if open
+    const login = document.getElementById('loginScreen');
+    if(login) login.style.display = 'none';
+
+    alert('Conta importada com sucesso!');
+  }catch(err){
+    console.error('Erro ao importar conta:', err);
+    alert('Falha ao aplicar os dados importados.');
+  }
+}
+
 function loadGame(){
 const save = localStorage.getItem('insigniasRushSave');
 
@@ -855,66 +1105,161 @@ endGame();
 }
 
 function spawnCircle(){
-const circle = document.createElement('div');
-circle.classList.add('circle');
+  // osu!-style hit circle with approach ring and timing window
+  const circle = document.createElement('div');
+  circle.classList.add('circle');
 
-const x = Math.random() * (gameArea.clientWidth - 100);
-const y = Math.random() * (gameArea.clientHeight - 100);
+  // inner target and approach ring
+  const target = document.createElement('div');
+  target.className = 'hit-target';
+  circle.appendChild(target);
 
-circle.style.left = x + 'px';
-circle.style.top = y + 'px';
+  const approach = document.createElement('div');
+  approach.className = 'approach';
+  circle.appendChild(approach);
 
-circle.onclick = ()=>{
-score++;
-coins += 10;
+  // position
+  const size = 160; // approach size reference
+  const x = Math.random() * (gameArea.clientWidth - size) + 20;
+  const y = Math.random() * (gameArea.clientHeight - size) + 20;
+  circle.style.left = x + 'px';
+  circle.style.top = y + 'px';
 
-document.getElementById('score').innerText = score;
-updateCoins();
+  // timing: approach duration (ms) until perfect hit moment
+  const approachDuration = 1200; // how long the ring shrinks
+  const spawnTime = performance.now();
 
-const effect = document.createElement('div');
-effect.className = 'hit-effect';
-effect.style.left = (x-15) + 'px';
-effect.style.top = (y-15) + 'px';
+  // start approach shrink animation by scaling transform
+  // approach starts larger and scales down to match target at hit time
+  approach.style.transform = 'translate(-50%,-50%) scale(1.6)';
+  approach.style.transition = `transform ${approachDuration}ms linear, opacity ${approachDuration}ms linear`;
+  // trigger shrink on next frame
+  requestAnimationFrame(()=>{
+    approach.style.transform = 'translate(-50%,-50%) scale(0.28)';
+    approach.style.opacity = '0.12';
+  });
 
-gameArea.appendChild(effect);
+  // track clicked and removed
+  let clicked = false;
+  let removed = false;
 
-setTimeout(()=>{
-effect.remove();
-},400);
+  // scoring windows (ms) relative to perfect time
+  const perfectWindow = 80;
+  const goodWindow = 160;
+  const missWindow = approachDuration + 300; // outside this is missed
 
-circle.remove();
-};
+  circle.addEventListener('click', (e)=>{
+    if(removed) return;
+    clicked = true;
+    const now = performance.now();
+    const elapsed = now - spawnTime;
+    // perfect moment is at approachDuration (when ring reaches target)
+    const diff = Math.abs(elapsed - approachDuration);
 
-setTimeout(()=>{
-if(circle.parentNode){
-circle.remove();
-}
-},1000);
+    let hitType = 'miss';
+    if(diff <= perfectWindow) hitType = 'perfect';
+    else if(diff <= goodWindow) hitType = 'good';
+    else hitType = 'late';
 
-gameArea.appendChild(circle);
+    // scoring: perfect > good > late
+    let points = 0;
+    let coinGain = 0;
+    if(hitType === 'perfect'){
+      points = 3;
+      coinGain = 30;
+      combo++;
+    } else if(hitType === 'good'){
+      points = 2;
+      coinGain = 20;
+      combo++;
+    } else {
+      points = 1;
+      coinGain = 10;
+      combo = 0; // break combo on poor timing
+    }
+
+    // multiplier from combo thresholds (keeps existing rules)
+    if(combo >= 15) multiplier = 4;
+    else if(combo >= 8) multiplier = 2;
+    else multiplier = 1;
+
+    score += points * multiplier;
+    coins += coinGain * multiplier;
+
+    // show tiny pop effect
+    const effect = document.createElement('div');
+    effect.className = 'hit-effect';
+    effect.style.left = (x-10) + 'px';
+    effect.style.top = (y-10) + 'px';
+    gameArea.appendChild(effect);
+    setTimeout(()=> effect.remove(), 450);
+
+    // update UI
+    document.getElementById('score').innerText = score;
+    updateCoins();
+    if(comboCountEl()) comboCountEl().innerText = combo;
+    if(multiplierEl()) multiplierEl().innerText = 'x' + multiplier;
+
+    // small sound
+    try{ const ping = new Audio('click.mp3'); ping.volume = 0.6; ping.play().catch(()=>{}); }catch(e){}
+
+    // remove circle
+    removed = true;
+    circle.remove();
+  });
+
+  // automatic removal after miss window
+  const timeoutId = setTimeout(()=>{
+    if(removed) return;
+    removed = true;
+    // miss: reset combo
+    combo = 0;
+    multiplier = 1;
+    if(comboCountEl()) comboCountEl().innerText = combo;
+    if(multiplierEl()) multiplierEl().innerText = 'x' + multiplier;
+    // small miss visual
+    const missFx = document.createElement('div');
+    missFx.className = 'hit-effect';
+    missFx.style.borderColor = 'rgba(255,80,80,0.9)';
+    missFx.style.left = (x-10) + 'px';
+    missFx.style.top = (y-10) + 'px';
+    gameArea.appendChild(missFx);
+    setTimeout(()=> missFx.remove(), 450);
+
+    if(circle.parentNode) circle.remove();
+  }, missWindow);
+
+  // add to DOM
+  gameArea.appendChild(circle);
 }
 
 function endGame(){
-gameRunning = false;
-clearInterval(spawnInterval);
-clearInterval(timerInterval);
+  gameRunning = false;
+  clearInterval(spawnInterval);
+  clearInterval(timerInterval);
 
-const earned = score * 10;
+  // coins already accumulated during the round; also keep this earned summary
+  const earned = score * 10;
+  document.getElementById('result').innerHTML = `🔥 Fim da partida! Você ganhou ${earned} moedas!`; 
 
-document.getElementById('result').innerHTML = `🔥 Fim da partida! Você ganhou ${earned} moedas!`; 
+  // reset combo and multiplier at the end
+  combo = 0;
+  multiplier = 1;
+  if(comboCountEl()) comboCountEl().innerText = combo;
+  if(multiplierEl()) multiplierEl().innerText = 'x' + multiplier;
 
-const best = localStorage.getItem('bestScore') || 0;
-if(score > best){
-localStorage.setItem('bestScore',score);
-}
+  const best = localStorage.getItem('bestScore') || 0;
+  if(score > best){
+    localStorage.setItem('bestScore',score);
+  }
 
-const bestEl = document.getElementById('bestScore');
-if(bestEl){
-bestEl.innerText = localStorage.getItem('bestScore') || 0;
-}
+  const bestEl = document.getElementById('bestScore');
+  if(bestEl){
+    bestEl.innerText = localStorage.getItem('bestScore') || 0;
+  }
 
-updateStats();
-saveGame();
+  updateStats();
+  saveGame();
 }
 
 function getRandomBadge(type){
@@ -965,68 +1310,137 @@ return filtered[Math.floor(Math.random()*filtered.length)];
 }
 
 function buyPack(type){
-let price = 100;
+  let price = 100;
+  if(type === 'rare') price = 250;
+  if(type === 'legendary') price = 500;
 
-if(type === 'rare') price = 250;
-if(type === 'legendary') price = 500;
+  if(coins < price){
+    alert('Moedas insuficientes!');
+    return;
+  }
 
-if(coins < price){
-alert('Moedas insuficientes!');
-return;
-}
+  coins -= price;
+  updateCoins();
 
-coins -= price;
-updateCoins();
+  // create opening overlay
+  const opening = document.createElement('div');
+  opening.className = 'pack-opening';
+  opening.innerHTML = `
+    <div class="confetti" id="confettiLayer"></div>
+    <div class="pack-box">
+      <div class="sparkle"></div>
+      <div id="packEmoji" style="transform:translateY(0);transition:transform 420ms;">📦</div>
+    </div>
+    <div class="pack-text">ABRINDO PACOTE...</div>
+    <div class="pack-flash" id="packFlash" style="opacity:0;"></div>
+    <div class="reveal-stage" id="revealStage" style="margin-top:26px;"></div>
+  `;
 
-const opening = document.createElement('div');
-opening.className = 'pack-opening';
-opening.innerHTML = `
-<div class="pack-box">📦</div>
-<div class="pack-text">ABRINDO PACOTE...</div>
-<div style="position:absolute;width:900px;height:900px;border-radius:50%;background:rgba(255,255,255,0.03);"></div>
-`;
+  document.body.appendChild(opening);
 
-document.body.appendChild(opening);
+  // play open sound (click.mp3) if available
+  try{
+    const audio = new Audio('click.mp3');
+    audio.volume = 0.9;
+    audio.play().catch(()=>{});
+  }catch(e){}
 
-setTimeout(()=>{
-opening.remove();
+  // small scale animation to "pop" the box
+  const boxEmoji = opening.querySelector('#packEmoji');
+  setTimeout(()=> boxEmoji.style.transform = 'translateY(-6px) scale(1.08)', 120);
+  setTimeout(()=> boxEmoji.style.transform = 'translateY(0) scale(1)', 420);
 
-const results = [];
+  // spawn confetti pieces
+  const confettiLayer = opening.querySelector('#confettiLayer');
+  const colors = ['#FDE047','#F97316','#60A5FA','#A78BFA','#34D399','#FB7185'];
+  for(let i=0;i<40;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti-piece';
+    c.style.background = colors[i % colors.length];
+    c.style.left = (Math.random()*100) + '%';
+    c.style.top = (-Math.random()*20) + '%';
+    c.style.animationDelay = (Math.random()*400) + 'ms';
+    c.style.transform = `translateY(-10vh) rotate(${Math.random()*360}deg)`;
+    c.style.opacity = 0.95;
+    confettiLayer.appendChild(c);
+  }
 
-for(let i=0;i<4;i++){
-const badge = getRandomBadge(type);
-collection[badge.name].count++;
-updateLevel(badge.name);
-results.push(badge);
-}
+  // After a short dramatic pause, reveal 4 cards one by one
+  setTimeout(()=>{
+    const results = [];
+    for(let i=0;i<4;i++){
+      const badge = getRandomBadge(type);
+      collection[badge.name].count++;
+      updateLevel(badge.name);
+      results.push(badge);
+    }
 
-let html = '';
+    // build cards but keep them hidden (no pointer events until revealed)
+    const revealStage = document.getElementById('revealStage');
+    revealStage.innerHTML = '';
+    results.forEach((badge, index)=>{
+      let rarityClass = '';
+      if(badge.rarity === 'Comum') rarityClass = 'rarity-common';
+      if(badge.rarity === 'Raro') rarityClass = 'rarity-rare';
+      if(badge.rarity === 'Épico') rarityClass = 'rarity-epic';
+      if(badge.rarity === 'Lendário') rarityClass = 'rarity-legendary';
+      if(badge.rarity === 'Mítico') rarityClass = 'rarity-mythic';
 
-results.forEach((badge,index)=>{
-let rarityClass = '';
+      const div = document.createElement('div');
+      div.className = 'pack-card';
+      div.style.width = '200px';
+      div.style.borderRadius = '18px';
+      div.style.padding = '18px';
+      div.style.background = 'linear-gradient(180deg,#0b1220,#111827)';
+      div.style.textAlign = 'center';
+      div.style.transitionDelay = (index * 220) + 'ms';
+      div.innerHTML = `
+        <div class="unique-medal ${badge.rarity.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace('lendario','legendary').replace('mitico','mythic').replace('epico','epic').replace('raro','rare').replace('comum','common')} sparkle" style="width:86px;height:86px;font-size:36px;">${badgeDesigns[badge.name]}</div>
+        <h3 style="margin-top:10px;" class="${rarityClass}">${badge.name}</h3>
+        <div style="color:#94a3b8;margin-top:6px;">${badge.rarity}</div>
+      `;
+      revealStage.appendChild(div);
 
-if(badge.rarity === 'Comum') rarityClass = 'rarity-common';
-if(badge.rarity === 'Raro') rarityClass = 'rarity-rare';
-if(badge.rarity === 'Épico') rarityClass = 'rarity-epic';
-if(badge.rarity === 'Lendário') rarityClass = 'rarity-legendary';
-if(badge.rarity === 'Mítico') rarityClass = 'rarity-mythic';
+      // staggered reveal
+      setTimeout(()=>{
+        div.classList.add('revealed');
+        // small sound on reveal
+        try{
+          const ping = new Audio('click.mp3');
+          ping.volume = 0.6;
+          ping.play().catch(()=>{});
+        }catch(e){}
+      }, 480 + index * 260);
+    });
 
-html += `
-<div class="pack-card rarity-${badge.rarity}" style="animation-delay:${index*0.25}s;">
-<div class="unique-medal ${badge.rarity.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace('lendario','legendary').replace('mitico','mythic').replace('epico','epic').replace('raro','rare').replace('comum','common')}">${badgeDesigns[badge.name]}</div>
-<h2 class="${rarityClass}">${badge.name}</h2>
-<h3>${badge.rarity}</h3>
-</div>
-`;
-});
+    // flash effect
+    const flash = document.getElementById('packFlash');
+    flash.style.opacity = 0.0;
+    setTimeout(()=>{ flash.style.opacity = 1; flash.style.animation = 'flash 420ms ease-out'; }, 520);
 
-document.getElementById('packResult').innerHTML = html;
+    // remove overlay after reveals finish
+    setTimeout(()=>{
+      opening.remove();
 
-renderCollection();
-updateStats();
-saveGame();
+      // render and save results
+      let html = '';
+      results.forEach((badge,index)=>{
+        html += `
+          <div class="pack-card" style="animation-delay:${index*0.12}s;">
+            <div class="unique-medal ${badge.rarity.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace('lendario','legendary').replace('mitico','mythic').replace('epico','epic').replace('raro','rare').replace('comum','common')}">${badgeDesigns[badge.name]}</div>
+            <h2 class="rarity-${badge.rarity}">${badge.name}</h2>
+            <h3>${badge.rarity}</h3>
+          </div>
+        `;
+      });
+      document.getElementById('packResult').innerHTML = html;
 
-},2200);
+      renderCollection();
+      updateStats();
+      saveGame();
+    }, 2000 + 4 * 260);
+
+  }, 700);
 }
 
 function updateLevel(name){
