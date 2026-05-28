@@ -1263,50 +1263,59 @@ function endGame(){
 }
 
 function getRandomBadge(type){
-let chances;
+  // Define rarity chances based on pack type
+  let chances;
+  if(type === 'common'){
+    chances = [
+      {rarity:'Comum', chance:60},
+      {rarity:'Raro', chance:25},
+      {rarity:'Épico', chance:10},
+      {rarity:'Lendário', chance:4},
+      {rarity:'Mítico', chance:1}
+    ];
+  } else if(type === 'rare'){
+    chances = [
+      {rarity:'Comum', chance:35},
+      {rarity:'Raro', chance:35},
+      {rarity:'Épico', chance:20},
+      {rarity:'Lendário', chance:8},
+      {rarity:'Mítico', chance:2}
+    ];
+  } else {
+    chances = [
+      {rarity:'Comum', chance:20},
+      {rarity:'Raro', chance:25},
+      {rarity:'Épico', chance:25},
+      {rarity:'Lendário', chance:20},
+      {rarity:'Mítico', chance:10}
+    ];
+  }
 
-if(type === 'common'){
-chances = [
-{rarity:'Comum', chance:60},
-{rarity:'Raro', chance:25},
-{rarity:'Épico', chance:10},
-{rarity:'Lendário', chance:4},
-{rarity:'Mítico', chance:1}
-];
-}
-else if(type === 'rare'){
-chances = [
-{rarity:'Comum', chance:35},
-{rarity:'Raro', chance:35},
-{rarity:'Épico', chance:20},
-{rarity:'Lendário', chance:8},
-{rarity:'Mítico', chance:2}
-];
-}
-else{
-chances = [
-{rarity:'Comum', chance:20},
-{rarity:'Raro', chance:25},
-{rarity:'Épico', chance:25},
-{rarity:'Lendário', chance:20},
-{rarity:'Mítico', chance:10}
-];
-}
+  // pick rarity
+  let randomVal = Math.random() * 100;
+  let cumulative = 0;
+  let selectedRarity = 'Comum';
+  for(let c of chances){
+    cumulative += c.chance;
+    if(randomVal <= cumulative){
+      selectedRarity = c.rarity;
+      break;
+    }
+  }
 
-let random = Math.random() * 100;
-let cumulative = 0;
-let selectedRarity = 'Comum';
+  // First try: filter badges by rarity AND that are NOT level 5
+  const candidates = badges.filter(b => b.rarity === selectedRarity && collection[b.name] && collection[b.name].level < 5);
 
-for(let c of chances){
-cumulative += c.chance;
-if(random <= cumulative){
-selectedRarity = c.rarity;
-break;
-}
-}
+  // If none available (all at level 5), fallback to any badge of the rarity (so player can still get duplicates)
+  let pool = candidates.length > 0 ? candidates : badges.filter(b => b.rarity === selectedRarity);
 
-const filtered = badges.filter(b=>b.rarity === selectedRarity);
-return filtered[Math.floor(Math.random()*filtered.length)];
+  // If still empty for some reason, fallback to whole badge pool filtered by level <5
+  if(pool.length === 0){
+    const pool2 = badges.filter(b => collection[b.name] && collection[b.name].level < 5);
+    pool = pool2.length > 0 ? pool2 : badges;
+  }
+
+  return pool[Math.floor(Math.random()*pool.length)];
 }
 
 function buyPack(type){
@@ -1369,9 +1378,23 @@ function buyPack(type){
   setTimeout(()=>{
     const results = [];
     for(let i=0;i<4;i++){
-      const badge = getRandomBadge(type);
-      collection[badge.name].count++;
-      updateLevel(badge.name);
+      // try to get a badge that isn't already at level 5; getRandomBadge prefers non-5 items,
+      // but retry a few times to avoid awarding level-5 progression.
+      let badge = getRandomBadge(type);
+      let tries = 0;
+      while(tries < 6 && collection[badge.name] && collection[badge.name].level >= 5){
+        badge = getRandomBadge(type);
+        tries++;
+      }
+
+      // Only increment count/level if the badge is below level 5
+      if(collection[badge.name] && collection[badge.name].level < 5){
+        collection[badge.name].count++;
+        updateLevel(badge.name);
+      } else {
+        // If it's still level 5, do not change count/level (duplicate with no progression)
+      }
+
       results.push(badge);
     }
 
